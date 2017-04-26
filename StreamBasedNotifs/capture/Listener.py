@@ -9,7 +9,7 @@ class Listener(threading.Thread):
         self.pubsub.subscribe(channels)
 
     def work(self, item):
-        print (item['channel'], ":", item['data'])
+        print (item)
 
     def run(self):
         for item in self.pubsub.listen():
@@ -21,7 +21,7 @@ class Listener(threading.Thread):
                 self.work(item)
 
 if __name__ == "__main__":
-    client = Listener(redis.StrictRedis(host='demo.scorebeyond.com',port=8007), ['test'])
+    client = Listener(redis.Redis(host='demo.scorebeyond.com',port=8007), ['test'])
     client.start()
 
     r.publish('test', 'this will reach the listener')
