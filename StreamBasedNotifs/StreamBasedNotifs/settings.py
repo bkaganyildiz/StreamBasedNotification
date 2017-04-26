@@ -56,7 +56,7 @@ ROOT_URLCONF = 'StreamBasedNotifs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [Temp_Path +"/template"],
+        'DIRS': [Temp_Path +"/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
