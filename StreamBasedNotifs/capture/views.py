@@ -6,10 +6,12 @@ from .forms import NotificationForm
 from django.http import JsonResponse
 # Create your views here.
 
+is_stream_started = False
 @csrf_exempt
 def captureEvents(request) :
     '''Route to background task and display the main page'''
-    #Channel('capture-stream').send({})
+    if not is_stream_started :
+        Channel('capture-stream').send({})
     streams = Stream.objects.all()
     events = {}
     for stream in streams:
