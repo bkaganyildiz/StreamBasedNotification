@@ -10,18 +10,17 @@ from django.http import JsonResponse
 def captureEvents(request) :
     '''Route to background task and display the main page'''
     #Channel('capture-stream').send({})
+    streams = Stream.objects.all()
+    events = {}
+    for stream in streams:
+        events[stream.name] = stream.info.split(',')
     form = NotificationForm(request.POST or None)
     if form.is_valid() :
         notification_name = form.cleaned_data.get("name")
-        print (type(notification_name), notification_name)
         event_name = form.cleaned_data.get("event")
-        print (type(event_name), event_name)
         target = form.cleaned_data.get("target") #if 0 user if 1 assoc. user
-        print (type(target), target)
         delay = form.cleaned_data.get("delay")
-        print (type(delay), delay)
         url = form.cleaned_data.get("url")
-        print (type(url), url)
         if Notification.objects.filter(event_name=event_name) :
             '''If there is a notification that created for this event update it'''
             notification = Notification.objects.get(event_name=event_name)
@@ -41,6 +40,6 @@ def captureEvents(request) :
                 itarget = True
             Notification.objects.create(event_name=event_name, name=notification_name,
                                         delay=delay, url=url, target=itarget)
-        return render(request, "capture.html", {"events": Stream.objects.all(), "form": NotificationForm()})
-    return render(request, "capture.html", {"events": Stream.objects.all(), "form": form})
+        return render(request, "capture.html", {"events": events, "form": NotificationForm()})
+    return render(request, "capture.html", {"events": events, "form": form})
 
