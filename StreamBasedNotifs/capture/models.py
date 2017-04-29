@@ -20,6 +20,6 @@ class Notification(models.Model):
     event_name = models.CharField(max_length=255)
     target = models.BooleanField(default=False) #if false user , else assoc. user
     delay = models.IntegerField(default=0)
-    url =  models.textfield()
+    url =  models.TextField()
     def __unicode__(self):
         return  self.name
