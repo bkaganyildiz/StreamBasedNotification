@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'capture',
+    'channels',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +129,13 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),"static_cdn")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('demo.scorebeyond.com', 8007)],
+        },
+        'ROUTING': 'routing.channel_routing',
+    }
+}
