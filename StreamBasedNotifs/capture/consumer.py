@@ -6,6 +6,7 @@ from .models import Stream, Notification
 import redis
 import ast
 import requests
+import time
 from background_task import background
 from .views import captureEvents
 from django.shortcuts import redirect
@@ -23,14 +24,13 @@ def ws_connect(message):
             "reply_channel": message.reply_channel.name,
         })
     })
-
-def ws_capture(message):
-    '''Capture redis stream and save it into database'''
     for message in subs.listen():
         if message['type'] == "message":
             data1 = ast.literal_eval(message['data'])
+            print data1['name']
             if Notification.objects.filter(event_name=data1['name']) :
-                sendNotifications(data1, schedule=Notification.objects.get(event_name=data1['name'].delay))
+                print "hello" + data1['name']
+                sendNotifications(data1, schedule=Notification.objects.get(event_name=data1['name']).delay)
             if not Stream.objects.filter(name=data1['name']):
                 type_list = []
                 if not data1['info']:
@@ -45,8 +45,31 @@ def ws_capture(message):
         else:
             print message
 
-@background(schedule=0)
-def sendNotifications(data):
+def ws_capture(message):
+    '''Capture redis stream and save it into database'''
+    for message in subs.listen():
+        if message['type'] == "message":
+            data1 = ast.literal_eval(message['data'])
+            print data1['name']
+            if Notification.objects.filter(event_name=data1['name']):
+                print "hello"
+                sendNotifications(data1, capture=Notification.objects.get(event_name=data1['name']).delay)
+            if not Stream.objects.filter(name=data1['name']):
+                type_list = []
+                if not data1['info']:
+                    Stream.objects.create(name=data1['name'], info="")
+                else:
+                    for k, v in data1['info'].iteritems():
+                        type_list.append(k+":"+type(v).__name__)
+                    Stream.objects.create(name=data1['name'], info=','.join(type_list))
+                Channel('capture-stream').send({"name":data1['name'],
+                                        "info":','.join(type_list),
+                                        })
+        else:
+            print message
+
+@background(capture=0)
+def sendNotifications(data,delay):
     '''send delayed notifications to webhook url'''
     notif_features = Notification.objects.get(event_name=data['name'])
     webhook_url = notif_features.url
@@ -64,6 +87,7 @@ def sendNotifications(data):
         webhook_url, data=json.dumps(slack_data),
         headers={'Content-Type': 'application/json'}
     )
+    print response
     if response.status_code/100 != 2:
         print (
             '%s \n %s'
