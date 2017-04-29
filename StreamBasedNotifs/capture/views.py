@@ -1,12 +1,16 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect , requires_csrf_token , csrf_exempt #for csrf protection
+from django.views.decorators.csrf import  csrf_exempt #for csrf protection
+from channels import Channel
+from .models import Stream
+import redis
+from django.http import JsonResponse
 # Create your views here.
 
 @csrf_exempt
 def captureEvents(request) :
     '''
-    Call Listener class that returns json object parse it and
-    send it to a template
+    Route to background task and display the main page
     '''
-    form = "hello"
-    return render(request,"capture.html",{'form' : form , 'title' : 'Remove Key'})
+    Channel('capture-stream').send({})
+    return render(request,"capture.html",{"events": Stream.objects.all()})
+
