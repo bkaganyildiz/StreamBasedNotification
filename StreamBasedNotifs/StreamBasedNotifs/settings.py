@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'capture',
     'channels',
     'celery',
+    'background_task',
 ]
 
 MIDDLEWARE = [
