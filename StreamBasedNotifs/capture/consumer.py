@@ -1,52 +1,21 @@
-import json
-import logging
 from channels import Channel
-from channels.sessions import channel_session
+from channels.auth import channel_session_user_from_http
 from .models import Stream, Notification
 import redis
 import ast
-import requests
-import time
-from background_task import background
-from .views import captureEvents
-from django.shortcuts import redirect
+from .task import sendNotifications
+from channels import Group
+import json
+#from djutils.decorators import async
 
-log = logging.getLogger(__name__)
 redis_con = redis.Redis('demo.scorebeyond.com', 8007)
 subs = redis_con.pubsub()
 subs.subscribe('test')
 
-@channel_session
+@channel_session_user_from_http
 def ws_connect(message):
-    message.reply_channel.send({
-        "text": json.dumps({
-            "action": "reply_channel",
-            "reply_channel": message.reply_channel.name,
-        })
-    })
-    for message in subs.listen():
-        if message['type'] == "message":
-            data1 = ast.literal_eval(message['data'])
-            print data1['name']
-            if Notification.objects.filter(event_name=data1['name']) :
-                print "hello" + data1['name']
-                sendNotifications(data1, schedule=Notification.objects.get(event_name=data1['name']).delay)
-            if not Stream.objects.filter(name=data1['name']):
-                type_list = []
-                if not data1['info']:
-                    Stream.objects.create(name=data1['name'], info="")
-                else:
-                    for k, v in data1['info'].iteritems():
-                        type_list.append(k+":"+type(v).__name__)
-                    Stream.objects.create(name=data1['name'], info=','.join(type_list))
-                Channel('capture-stream').send({"name":data1['name'],
-                                        "info":','.join(type_list),
-                                        })
-        else:
-            print message
-
-def ws_capture(message):
     '''Capture redis stream and save it into database'''
+    Group('stream').add(message.reply_channel)
     for message in subs.listen():
         if message['type'] == "message":
             data1 = ast.literal_eval(message['data'])
@@ -62,34 +31,12 @@ def ws_capture(message):
                     for k, v in data1['info'].iteritems():
                         type_list.append(k+":"+type(v).__name__)
                     Stream.objects.create(name=data1['name'], info=','.join(type_list))
-                Channel('capture-stream').send({"name":data1['name'],
-                                        "info":','.join(type_list),
-                                        })
+                Group('stream').send({
+                    'text': json.dumps({
+                        'username': data1['name'],
+                        'is_logged_in': True
+                    })
+                })
         else:
             print message
 
-@background(capture=0)
-def sendNotifications(data,delay):
-    '''send delayed notifications to webhook url'''
-    notif_features = Notification.objects.get(event_name=data['name'])
-    webhook_url = notif_features.url
-    slack_data = {}
-    slack_data['info'] = data['info']
-    target_data = []
-    if not notif_features.target : # If target has been set as User
-        target_data.append(data['user_id'])
-        slack_data['target'] = target_data
-    else:
-        slack_data['target'] = data['associated_user_ids']
-    slack_data['event_name'] = data['name']
-    slack_data['name'] = notif_features.name
-    response = requests.post(
-        webhook_url, data=json.dumps(slack_data),
-        headers={'Content-Type': 'application/json'}
-    )
-    print response
-    if response.status_code/100 != 2:
-        print (
-            '%s \n %s'
-            % (str(response.status_code), data)
-        )
