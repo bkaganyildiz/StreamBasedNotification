@@ -4,14 +4,12 @@ from channels import Channel
 from .models import Stream , Notification
 from .forms import NotificationForm
 from django.http import JsonResponse
+from .task import listen_stream
 # Create your views here.
 
-is_stream_started = False
 @csrf_exempt
-def captureEvents(request) :
+def captureEvents(request):
     '''Route to background task and display the main page'''
-    if not is_stream_started :
-        Channel('capture-stream').send({})
     streams = Stream.objects.all()
     events = {}
     for stream in streams:
@@ -42,6 +40,15 @@ def captureEvents(request) :
                 itarget = True
             Notification.objects.create(event_name=event_name, name=notification_name,
                                         delay=delay, url=url, target=itarget)
-        return render(request, "capture.html", {"events": events, "form": NotificationForm()})
-    return render(request, "capture.html", {"events": events, "form": form})
+        return render(request, "updateCapture.html", {"events": events, "form": NotificationForm()})
+    return render(request, "updateCapture.html", {"events": events, "form": form})
 
+
+def updateEvents(request):
+    if request.method == "GET" :
+        events = {}
+        streams = Stream.objects.all()
+        for stream in streams:
+            events[stream.name] = stream.info.split(',')
+        return JsonResponse(events)
+    return JsonResponse({})
