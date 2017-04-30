@@ -1,9 +1,7 @@
 from channels.routing import route
-from capture.consumer import ws_connect, ws_capture
+from capture.consumer import ws_connect
 
 
 channel_routing = [
     route('websocket.connect', ws_connect),
-    route('capture-stream',ws_capture),
-
 ]
