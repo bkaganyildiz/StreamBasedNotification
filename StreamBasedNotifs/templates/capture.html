@@ -1,31 +1,36 @@
-<html xmlns="http://www.w3.org/1999/html">
+<html>
   <head>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+      <script type="text/javascript">
+            {% block update %}{% endblock %}
+      </script>
   </head>
-  <script>
-  </script>
-  <h1 style="margin:1em 0em 0em 12em;">Stream Based Notifications</h1>
+
+  <h1 style="margin:1em 0em 0em 30%;">Stream Based Notifications</h1>
 
 
-  <div class="row" style="margin:1em 5em 5em 10em;">
+  <div class="row" style="margin:3% 0% 10% 10%;">
     <div class="col-md-6">
-      <h2 style="margin:0px 0em 1em 2em;text-decoration: underline;">Events</h2>
+      <h2 style="margin:0px 0em 6% 5%;text-decoration: underline;">Events</h2>
+      <ul>
       {% for name, info in events.items %}
-        <h4>{{name}}</h4>
-        <div class="list-group" style="width:30%;">
+        <li>{{name}}</li>
+        <ul>
           {% for i in info %}
-            <a class="list-group-item" >{{i}}</a>
+            <li>{{i}}</li>
           {% endfor %}
-        </div>
+        </ul>
       {% endfor %}
+      </ul>
     </div>
 
     <div class="col-md-6">
       <h2 style="margin:0px 0em 1em 2em;text-decoration: underline;">Notification</h2>
-      <form action="" method="post">
-        {{form.as_p}}
+      <form action="" method="post" class="form-horizontal">
+        {{form.as_ul}}
         <input type="submit" value="Send">
       </form>
     </div>
