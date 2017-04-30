@@ -20,7 +20,7 @@ In order to start stream :
 
 In order to send notifications :
 
-[Django-Background-Task])(http://django-background-tasks.readthedocs.io/en/latest/)
+[Django-Background-Task](http://django-background-tasks.readthedocs.io/en/latest/)
 
 
 
