@@ -31,7 +31,7 @@ In order to run :
 cd StreamBasedNotifs
 ```
 ```
-python manage.py rumserver
+python manage.py runserver
 ```
 
 ### Some bugs that’s going to be fixed : 
