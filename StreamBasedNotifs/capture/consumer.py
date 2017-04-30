@@ -1,4 +1,3 @@
-from channels import Channel
 from channels.auth import channel_session_user_from_http
 from .models import Stream, Notification
 import redis
@@ -6,7 +5,6 @@ import ast
 from .task import sendNotifications
 from channels import Group
 import json
-#from djutils.decorators import async
 
 redis_con = redis.Redis('demo.scorebeyond.com', 8007)
 subs = redis_con.pubsub()
@@ -33,8 +31,8 @@ def ws_connect(message):
                     Stream.objects.create(name=data1['name'], info=','.join(type_list))
                 Group('stream').send({
                     'text': json.dumps({
-                        'username': data1['name'],
-                        'is_logged_in': True
+                        'event_name': data1['name'],
+                        'blueprint': ','.join(type_list),
                     })
                 })
         else:
