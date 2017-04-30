@@ -8,18 +8,15 @@
         socket.onmessage = function message(event) {
           var data = JSON.parse(event.data);
           // NOTE: We escape JavaScript to prevent XSS attacks.
-          var username = encodeURI(data['username']);
-          window.alert(username);
-          var user = $('li').filter(function () {
-            return $(this).data('username') == username;
+          var event_name = data["event_name"];
+          var blueprint = data["blueprint"];
+          var bluelist = blueprint.split(",");
+          var events = $("#events");
+          events.append("<li>"+event_name+"</li><ul>");
+          bluelist.forEach(function(each){
+             events.append("<li>" + each + "</li>");
           });
-
-          if (data['is_logged_in']) {
-            user.html(username + ': Online');
-          }
-          else {
-            user.html(username + ': Offline');
-          }
+          events.append("</ul>");
         };
         if (socket.readyState == WebSocket.OPEN) {
           socket.onopen();
