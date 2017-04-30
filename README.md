@@ -40,7 +40,7 @@ python manage.py runserver
 
 - When you load the initial page too much main thread locks and daphne gives 503 error. 
 
-— While sending the notifications background-task lib takes the task and stored in the database which eventually does not complete the task you have to complete manually as they says in their library .
+ - While sending the notifications background-task lib takes the task and stored in the database which eventually does not complete the task you have to complete manually as they says in their library .
 
 ## License
 
