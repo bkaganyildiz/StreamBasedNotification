@@ -140,3 +140,5 @@ CHANNEL_LAYERS = {
         'ROUTING': 'routing.channel_routing',
     }
 }
+
+BACKGROUND_TASK_RUN_ASYNC=True
