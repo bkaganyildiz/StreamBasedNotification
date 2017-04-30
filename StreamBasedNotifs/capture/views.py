@@ -1,10 +1,8 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import  csrf_exempt #for csrf protection
-from channels import Channel
 from .models import Stream , Notification
 from .forms import NotificationForm
 from django.http import JsonResponse
-from .task import listen_stream
 # Create your views here.
 
 @csrf_exempt
@@ -36,7 +34,7 @@ def captureEvents(request):
         else:
             '''If there is no notification created for this event'''
             itarget = False
-            if target == '1' :
+            if target == '1':
                 itarget = True
             Notification.objects.create(event_name=event_name, name=notification_name,
                                         delay=delay, url=url, target=itarget)
