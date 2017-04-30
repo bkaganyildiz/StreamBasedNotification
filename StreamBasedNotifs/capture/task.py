@@ -5,6 +5,12 @@ import json
 from .models import Stream, Notification
 import redis
 import ast
+import logging
+logger = logging.getLogger('StreamBasedNotifs')
+hdlr = logging.FileHandler('notifications.log')
+formatter = logging.Formatter('%(asctime)s  %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr)
 
 @background(schedule=0)
 def sendNotifications(data):
@@ -26,7 +32,7 @@ def sendNotifications(data):
         headers={'Content-Type': 'application/json'}
     )
     if response.status_code/100 != 2:
-        print (
+        logger.error(
             '%s \n %s'
             % (str(response.status_code), data)
         )
