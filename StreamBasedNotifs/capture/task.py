@@ -37,6 +37,31 @@ def sendNotifications(data):
             % (str(response.status_code), data)
         )
 
+def send_notifications(data):
+    '''send notifications without delay to webhook url'''
+    notif_features = Notification.objects.get(event_name=data['name'])
+    webhook_url = notif_features.url
+    slack_data = {}
+    slack_data['info'] = data['info']
+    target_data = []
+    if not notif_features.target:  # If target has been set as User
+        target_data.append(data['user_id'])
+        slack_data['target'] = target_data
+    else:
+        slack_data['target'] = data['associated_user_ids']
+    slack_data['event_name'] = data['name']
+    slack_data['name'] = notif_features.name
+    response = requests.post(
+        webhook_url, data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )
+
+    if response.status_code / 100 != 2:
+        logger.error(
+            '%s \n %s'
+            % (str(response.status_code), data)
+        )
+
 @background(schedule=-1)
 def listen_stream():
     redis_con = redis.Redis('demo.scorebeyond.com', 8007)
