@@ -41,8 +41,12 @@ def captureEvents(request):
             itarget = False
             if target == '1':
                 itarget = True
-            Notification.objects.create(event_name=event_name, name=notification_name,
+            if not no_delay:
+                Notification.objects.create(event_name=event_name, name=notification_name,
                                         delay=delay, url=url, target=itarget)
+            else :
+                Notification.objects.create(event_name=event_name, name=notification_name,
+                                            no_delay=no_delay, url=url, target=itarget)
         return render(request, "updateCapture.html", {"events": events, "form": NotificationForm()})
     return render(request, "updateCapture.html", {"events": events, "form": form})
 
