@@ -45,9 +45,7 @@ def listen_stream():
     for message in subs.listen():
         if message['type'] == "message":
             data1 = ast.literal_eval(message['data'])
-            print data1['name']
             if Notification.objects.filter(event_name=data1['name']):
-                print "hello"
                 sendNotifications(data1, capture=Notification.objects.get(event_name=data1['name']).delay)
             if not Stream.objects.filter(name=data1['name']):
                 type_list = []
