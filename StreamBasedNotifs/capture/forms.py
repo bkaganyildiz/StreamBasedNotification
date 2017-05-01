@@ -8,9 +8,9 @@ class NotificationForm(forms.Form):
                               label="Event Name ")
     target = forms.ChoiceField(required=True, choices=[(0, "User"), (1, "Associated User")],
                                widget=forms.Select(attrs={'class': 'select-style'}), label="Target ")
-    delay = forms.IntegerField(required=True, label="Delay ")
+    delay = forms.IntegerField(required=False, label="Delay ")
+    no_delay = forms.BooleanField(label="No Delay")
     url = forms.URLField(label="Webhook URL ", required=True)
-
     def __init__(self, *args, **kwargs):
         '''In order to update dropdown for new coming events '''
         super(NotificationForm, self).__init__(*args, **kwargs)
