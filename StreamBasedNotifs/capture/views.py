@@ -17,14 +17,19 @@ def captureEvents(request):
         notification_name = form.cleaned_data.get("name")
         event_name = form.cleaned_data.get("event")
         target = form.cleaned_data.get("target") #if 0 user if 1 assoc. user
-        delay = form.cleaned_data.get("delay")
+        no_delay = form.cleaned_data.get("no_delay")
+        if not no_delay:
+            delay = form.cleaned_data.get("delay")
         url = form.cleaned_data.get("url")
+        print no_delay
         if Notification.objects.filter(event_name=event_name) :
             '''If there is a notification that created for this event update it'''
             notification = Notification.objects.get(event_name=event_name)
             notification.name = notification_name
-            notification.delay = delay
+            if not no_delay :
+                notification.delay = delay
             notification.url = url
+            notification.no_delay = no_delay
             if target == '0':
                 notification.target = False
             else:
