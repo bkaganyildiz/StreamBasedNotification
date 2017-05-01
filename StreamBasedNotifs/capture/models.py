@@ -21,5 +21,6 @@ class Notification(models.Model):
     target = models.BooleanField(default=False) #if false user , else assoc. user
     delay = models.IntegerField(default=0)
     url =  models.TextField()
+    no_delay = models.BooleanField(default=False)
     def __unicode__(self):
         return  self.name
