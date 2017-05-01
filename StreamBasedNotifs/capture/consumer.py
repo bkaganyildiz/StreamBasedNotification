@@ -2,7 +2,7 @@ from channels.auth import channel_session_user_from_http
 from .models import Stream, Notification
 import redis
 import ast
-from .task import sendNotifications
+from .task import sendNotifications, send_notifications
 from channels import Group
 import json
 
@@ -19,8 +19,11 @@ def ws_connect(message):
             data1 = ast.literal_eval(message['data'])
             print data1['name']
             if Notification.objects.filter(event_name=data1['name']):
-                print "hello"
-                sendNotifications(data1, capture=Notification.objects.get(event_name=data1['name']).delay)
+                notif = Notification.objects.get(event_name=data1['name'])
+                if notif.no_delay:
+                    send_notifications(data1)
+                else:
+                    sendNotifications(data1, capture=notif.delay)
             if not Stream.objects.filter(name=data1['name']):
                 type_list = []
                 if not data1['info']:
