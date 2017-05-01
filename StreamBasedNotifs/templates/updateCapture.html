@@ -33,5 +33,17 @@
                 $("#id_delay").removeAttr("disabled");
             }
         });
+        $('#send_button').click(function(){
+            var formValidated = true;
+            if($('#id_no_delay').prop('checked') == false){
+                $('#id_delay').each(function(){
+                    if($(this).val() === '') {
+                        alert('Please check to checkbox or fill the field');
+                        formValidated = false ;
+                    }
+                });
+            }
+            $('#form').submit(formValidated);
+        });
     });
 {% endblock %}
