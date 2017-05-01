@@ -22,3 +22,16 @@
           socket.onopen();
         }
 {% endblock %}
+
+{% block delay %}
+    $(document).ready(function() {
+
+        $('#id_no_delay').change(function() {
+            if($(this).is(":checked")) {
+                $("#id_delay").attr("disabled", "disabled");
+            }else{
+                $("#id_delay").removeAttr("disabled");
+            }
+        });
+    });
+{% endblock %}
